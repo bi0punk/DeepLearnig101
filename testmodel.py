@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import speech_recognition as sr
 
 # Definir los datos de entrenamiento
 x_train = np.array(['Hola', 'Hola, ¿cómo estás?', 'Buen día', 'Saludos'], dtype=object)
@@ -34,27 +35,11 @@ model = tf.keras.models.Sequential([
 # Compilar el modelo
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-model_filename = "greeting_trained.h5"
-
-
-
-model.save(model_filename)
-
+# Especificar el nombre del archivo del modelo entrenado
+model_filename = "modelo_entrenado.h5"
 
 # Entrenar el modelo
 model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
 
-# Hacer predicciones
-x_test = np.array(['Hola', 'Hola, ¿cómo estás?', 'Buen día', 'Saludos', 'hi', 'hello', 'que pasa', 'hola karlita'])
-x_test_encoded = tokenizer.texts_to_sequences(x_test)
-x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
-predictions = model.predict(x_test_padded)
-
-
-inverse_label_mapping = {v: k for k, v in label_mapping.items()}
-
-
-decoded_predictions = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions]
-
-for i in range(len(x_test)):
-    print(f'\nInput: {x_test[i]} \nPredicted Output: {decoded_predictions[i]}')
+# Guardar el modelo entrenado
+model.save(model_filename)
