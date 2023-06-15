@@ -1,7 +1,6 @@
 from testmodel import *
 
 
-
 def capture_audio():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
