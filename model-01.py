@@ -33,7 +33,7 @@ model = tf.keras.models.Sequential([
 
 # Compilar el modelo
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-# Especificar el nombre del archivo del modelo entrenado
+
 model_filename = "greeting_trained.h5"
 
 
@@ -50,12 +50,11 @@ x_test_encoded = tokenizer.texts_to_sequences(x_test)
 x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
 predictions = model.predict(x_test_padded)
 
-# Invertir el diccionario label_mapping
+
 inverse_label_mapping = {v: k for k, v in label_mapping.items()}
 
-# Decodificar las predicciones
+
 decoded_predictions = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions]
 
-# Imprimir las predicciones
 for i in range(len(x_test)):
     print(f'\nInput: {x_test[i]} \nPredicted Output: {decoded_predictions[i]}')
