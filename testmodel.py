@@ -36,7 +36,7 @@ model = tf.keras.models.Sequential([
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Especificar el nombre del archivo del modelo entrenado
-model_filename = "modelo_entrenado.h5"
+model_filename = "trained_model.h5"
 
 # Entrenar el modelo
 model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
