@@ -37,8 +37,9 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 # Entrenar el modelo
 model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
 
-# Hacer predicciones
-x_test_encoded = tokenizer.texts_to_sequences(x_train)
+# Obtener la entrada del usuario para hacer predicciones
+user_input = input("Ingrese una oración: ")
+x_test_encoded = tokenizer.texts_to_sequences([user_input])
 x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
 
 predictions = model.predict(x_test_padded)
@@ -47,8 +48,7 @@ predictions = model.predict(x_test_padded)
 inverse_label_mapping = {v: k for k, v in label_mapping.items()}
 
 # Decodificar las predicciones
-decoded_predictions = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions]
+decoded_prediction = inverse_label_mapping[np.argmax(predictions)]
 
-# Imprimir las predicciones
-for i in range(len(x_train)):
-    print(f'Input: {x_train[i]}, Predicted Output: {decoded_predictions[i]}')
+# Imprimir la predicción
+print(f'Input: {user_input}, Predicted Output: {decoded_prediction}')
