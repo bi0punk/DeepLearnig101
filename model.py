@@ -38,6 +38,9 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 # Entrenar el modelo
 model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
 
+# Guardar el modelo
+model.save('modelo_entrenado.h5')
+
 # Hacer predicciones
 x_test_encoded = tokenizer.texts_to_sequences(x_train)
 x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
@@ -51,7 +54,7 @@ inverse_label_mapping = {v: k for k, v in label_mapping.items()}
 decoded_predictions = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions]
 
 # Crear una tabla para imprimir las predicciones
-table = PrettyTable(['Input', 'Predicted Output'])
+table = PrettyTable(['Entrada', 'Predicción de salida'])
 for i in range(len(x_train)):
     table.add_row([x_train[i], decoded_predictions[i]])
 
