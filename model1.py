@@ -1,6 +1,27 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import speech_recognition as sr
+import pyttsx3
+
+def voice_main():
+    r = sr.Recognizer() 
+    with sr.Microphone() as source:
+            print('Speak Anything : ')
+            audio = r.listen(source)
+
+            try:
+                    text = r.recognize_google(audio)
+                    print(text)
+                    print('You said: {}'.format(text))
+            except:
+                    print('Sorry could not hear')
+    return text
+
+def text_to_speech(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
 
 # Definir los datos de entrenamiento
 x_train = np.array(['Hola', 'Hola, ¿cómo estás?', 'Buen día', 'Saludos'], dtype=object)
@@ -38,7 +59,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
 
 # Obtener la entrada del usuario para hacer predicciones
-user_input = input("Ingrese una oración: ")
+user_input = voice_main()
 x_test_encoded = tokenizer.texts_to_sequences([user_input])
 x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
 
@@ -50,5 +71,5 @@ inverse_label_mapping = {v: k for k, v in label_mapping.items()}
 # Decodificar las predicciones
 decoded_prediction = inverse_label_mapping[np.argmax(predictions)]
 
-# Imprimir la predicción
-print(f'Input: {user_input}, Predicted Output: {decoded_prediction}')
+# Convertir la predicción en voz
+text_to_speech(f'Input: {user_input}, Predicted Output: {decoded_prediction}')

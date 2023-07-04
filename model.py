@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from prettytable import PrettyTable
 
 # Definir los datos de entrenamiento
 x_train = np.array(['Hola', 'Hola, ¿cómo estás?', 'Buen día', 'Saludos'], dtype=object)
@@ -49,6 +50,10 @@ inverse_label_mapping = {v: k for k, v in label_mapping.items()}
 # Decodificar las predicciones
 decoded_predictions = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions]
 
-# Imprimir las predicciones
+# Crear una tabla para imprimir las predicciones
+table = PrettyTable(['Input', 'Predicted Output'])
 for i in range(len(x_train)):
-    print(f'Input: {x_train[i]}, Predicted Output: {decoded_predictions[i]}')
+    table.add_row([x_train[i], decoded_predictions[i]])
+
+# Imprimir la tabla de predicciones
+print(table)
