@@ -32,7 +32,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
 
 # Datos de prueba
-x_test = np.array(['Buenos días'])
+x_test = np.array([input("Ingrese el texto de prueba: ")])
 x_test_encoded = tokenizer.texts_to_sequences(x_test)
 filtered_x_test = [x_test[i] for i, sequence in enumerate(x_test_encoded) if any(sequence)]
 filtered_x_test_encoded = [sequence for sequence in x_test_encoded if any(sequence)]
