@@ -3,12 +3,19 @@ import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from prettytable import PrettyTable
 
-# Definir los datos de entrenamiento
-x_train = np.array(['Hola', 'Hola, ¿cómo estás?', 'Buen día', 'Saludos'], dtype=object)
-y_train = np.array(['Hola', 'Bien, ¿y tú?', 'Hola', 'Hola'], dtype=object)
+# Definir los datos de entrenamiento adicionales
+x_train_additional = np.array(['¡Buenos días!', '¿Qué tal?', 'Hola, ¿cómo va todo?', 'Saludos a todos', 'Hola de nuevo',
+                               '¡Hola, buenas tardes!', '¿Cómo estuvo tu día?', 'Hola, ¿qué haces?', 'Saludos amigos',
+                               '¡Hola, qué gusto verte!'], dtype=object)
+y_train_additional = np.array(['Hola', 'Bien, ¿y tú?', 'Hola', 'Hola', 'Hola a todos', 'Hola', 'Bien, ¿y tú?',
+                               'Hola', 'Hola a todos', 'Hola'], dtype=object)
+
+# Agregar los datos adicionales a los conjuntos de entrenamiento existentes
+x_train = np.concatenate((x_train, x_train_additional))
+y_train = np.concatenate((y_train, y_train_additional))
 
 # Convertir las etiquetas a valores numéricos
-label_mapping = {'Hola': 0, 'Bien, ¿y tú?': 1}
+label_mapping = {'Hola': 0, 'Bien, ¿y tú?': 1, 'Hola a todos': 2}
 y_train_encoded = np.array([label_mapping[label] for label in y_train])
 
 # Tokenizar los datos de entrada
@@ -41,11 +48,11 @@ model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
 # Guardar el modelo
 model.save('modelo_entrenado.h5')
 
-# Hacer predicciones
-x_test_encoded = tokenizer.texts_to_sequences(x_train)
-x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
+# Hacer predicciones para todos los datos de entrada
+x_train_encoded = tokenizer.texts_to_sequences(x_train)
+x_train_padded = pad_sequences(x_train_encoded, maxlen=max_seq_length)
 
-predictions = model.predict(x_test_padded)
+predictions = model.predict(x_train_padded)
 
 # Invertir el diccionario label_mapping
 inverse_label_mapping = {v: k for k, v in label_mapping.items()}
