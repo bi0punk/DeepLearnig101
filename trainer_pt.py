@@ -3,6 +3,10 @@ import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from prettytable import PrettyTable
 
+# Definir los datos de entrenamiento originales
+x_train = np.array(['Hola', 'Bien, ¿y tú?', 'Hola a todos'], dtype=object)
+y_train = np.array(['Hola', 'Bien, ¿y tú?', 'Hola a todos'], dtype=object)
+
 # Definir los datos de entrenamiento adicionales
 x_train_additional = np.array(['¡Buenos días!', '¿Qué tal?', 'Hola, ¿cómo va todo?', 'Saludos a todos', 'Hola de nuevo',
                                '¡Hola, buenas tardes!', '¿Cómo estuvo tu día?', 'Hola, ¿qué haces?', 'Saludos amigos',
