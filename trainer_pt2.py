@@ -5,22 +5,66 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from prettytable import PrettyTable
 from sklearn.metrics import confusion_matrix, classification_report
 
+# Definir los datos de entrenamiento originales
+x_train = np.array(['Hola', 'Bien, ¿y tú?', 'Hola a todos'], dtype=object)
+y_train = np.array(['Hola', 'Bien, ¿y tú?', 'Hola a todos'], dtype=object)
+
+# Definir los datos de entrenamiento adicionales
+x_train_additional = np.array(['¡Buenos días!', '¿Qué tal?', 'Hola, ¿cómo va todo?', 'Saludos a todos', 'Hola de nuevo',
+                               '¡Hola, buenas tardes!', '¿Cómo estuvo tu día?', 'Hola, ¿qué haces?', 'Saludos amigos',
+                               '¡Hola, qué gusto verte!'], dtype=object)
+
+y_train_additional = np.array(['Hola', 'Bien, ¿y tú?', 'Hola', 'Hola', 'Hola a todos', 'Hola', 'Bien, ¿y tú?',
+                               'Hola', 'Hola a todos', 'Hola'], dtype=object)
+
+# Agregar los datos adicionales a los conjuntos de entrenamiento existentes
+x_train = np.concatenate((x_train, x_train_additional))
+y_train = np.concatenate((y_train, y_train_additional))
+
 # Separar los datos en conjuntos de entrenamiento y prueba
 x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=0.2, random_state=42)
 
-# Resto del código sigue igual hasta el entrenamiento del modelo...
-
-# Evaluar el modelo en el conjunto de prueba
-x_test_encoded = tokenizer.texts_to_sequences(x_test)
-x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
+# Convertir las etiquetas a valores numéricos
+label_mapping = {'Hola': 0, 'Bien, ¿y tú?': 1, 'Hola a todos': 2}
+y_train_encoded = np.array([label_mapping[label] for label in y_train])
 y_test_encoded = np.array([label_mapping[label] for label in y_test])
+
+# Tokenizar los datos de entrada
+tokenizer = tf.keras.preprocessing.text.Tokenizer()
+tokenizer.fit_on_texts(x_train)
+x_train_encoded = tokenizer.texts_to_sequences(x_train)
+x_test_encoded = tokenizer.texts_to_sequences(x_test)
+
+# Padding de las secuencias
+max_seq_length = max(len(seq) for seq in x_train_encoded)
+x_train_padded = pad_sequences(x_train_encoded, maxlen=max_seq_length)
+x_test_padded = pad_sequences(x_test_encoded, maxlen=max_seq_length)
+
+# Convertir las etiquetas en codificación one-hot
+num_classes = len(label_mapping)
+y_train_encoded = tf.keras.utils.to_categorical(y_train_encoded, num_classes=num_classes)
 y_test_encoded = tf.keras.utils.to_categorical(y_test_encoded, num_classes=num_classes)
 
-# Hacer predicciones en el conjunto de prueba
-predictions_test = model.predict(x_test_padded)
+# Definir el modelo de la red neuronal
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Embedding(len(tokenizer.word_index) + 1, 32, input_length=max_seq_length),
+    tf.keras.layers.GlobalAveragePooling1D(),
+    tf.keras.layers.Dense(16, activation='relu'),
+    tf.keras.layers.Dense(num_classes, activation='softmax')
+])
 
-# Decodificar las predicciones en el conjunto de prueba
-decoded_predictions_test = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions_test]
+# Compilar el modelo
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Entrenar el modelo
+model.fit(x_train_padded, y_train_encoded, epochs=100, verbose=0)
+
+# Guardar el modelo
+model.save('modelo_entrenado.h5')
+
+# Evaluar el modelo en el conjunto de prueba
+predictions_test = model.predict(x_test_padded)
+decoded_predictions_test = [label_mapping[label] for label in np.argmax(predictions_test, axis=1)]
 
 # Imprimir la matriz de confusión y el reporte de clasificación en el conjunto de prueba
 conf_matrix = confusion_matrix(y_test, decoded_predictions_test)
@@ -32,4 +76,29 @@ print(conf_matrix)
 print("\nReporte de Clasificación:")
 print(class_report)
 
-# Resto del código sigue igual para la impresión de la tabla...
+# Hacer predicciones para todos los datos de entrada (conjunto de entrenamiento y prueba)
+all_data = np.concatenate((x_train, x_test))
+x_all_encoded = tokenizer.texts_to_sequences(all_data)
+x_all_padded = pad_sequences(x_all_encoded, maxlen=max_seq_length)
+
+predictions_all = model.predict(x_all_padded)
+
+# Crear un nuevo mapeo de etiquetas para el conjunto completo
+label_mapping_all = {v: k for k, v in label_mapping.items()}
+
+# Decodificar las predicciones para el conjunto completo
+decoded_predictions_all = [label_mapping_all[np.argmax(prediction)] for prediction in predictions_all]
+
+# Invertir el diccionario label_mapping
+inverse_label_mapping = {v: k for k, v in label_mapping.items()}
+
+# Decodificar las predicciones
+decoded_predictions = [inverse_label_mapping[np.argmax(prediction)] for prediction in predictions_all]
+
+# Crear una tabla para imprimir las predicciones
+table = PrettyTable(['Entrada', 'Predicción de salida'])
+for i in range(len(all_data)):
+    table.add_row([all_data[i], decoded_predictions[i]])
+
+# Imprimir la tabla de predicciones
+print(table)
