@@ -11,6 +11,8 @@ y_train = np.array(['Hola', 'Bien, ¿y tú?', 'Hola a todos'], dtype=object)
 x_train_additional = np.array(['¡Buenos días!', '¿Qué tal?', 'Hola, ¿cómo va todo?', 'Saludos a todos', 'Hola de nuevo',
                                '¡Hola, buenas tardes!', '¿Cómo estuvo tu día?', 'Hola, ¿qué haces?', 'Saludos amigos',
                                '¡Hola, qué gusto verte!'], dtype=object)
+
+                               
 y_train_additional = np.array(['Hola', 'Bien, ¿y tú?', 'Hola', 'Hola', 'Hola a todos', 'Hola', 'Bien, ¿y tú?',
                                'Hola', 'Hola a todos', 'Hola'], dtype=object)
 
